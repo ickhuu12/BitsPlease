@@ -10,7 +10,6 @@ class Player {
 	
   /**
   *Method to determine if the board is active
-  *@author Jimmy
   *@return isActive boolean returning true if the player is active, false otherwise
   */
   public boolean checkActive(){
@@ -18,10 +17,9 @@ class Player {
 	}
 	
   /**
-  *Method 
-  *@author Jimmy
+  *Method to set player as active
   */
 	public void setActive(){
-		isActive = false;
+		isActive = true;
 	}
 }
