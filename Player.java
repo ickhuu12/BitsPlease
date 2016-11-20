@@ -8,7 +8,7 @@ class Player {
 	private boolean isActive = false;
 	public Space Location;
 	
-	/**
+  /**
   *Method to determine if the board is active
   *@author Jimmy
   *@return isActive boolean returning true if the player is active, false otherwise
