@@ -1,7 +1,8 @@
 package clueless;
 
 /**
-*Class for the Player object
+*Class for the Player objects
+*
 *@author Jimmy
 *@version 0.8
 */	

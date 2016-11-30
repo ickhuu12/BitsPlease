@@ -19,16 +19,20 @@ public class Tester {
 		playerList.add(player5);
 		playerList.add(player6);
 		
-		Board board = new Board();
+		BoardGame boardGame = new BoardGame();
+		boardGame.loadWinningCards();
+		boardGame.combineDecks();
+		
+		/*Board board = new Board();
 		board.loadInitialBoard(playerList);
 		
 		System.out.println("Room 1 is a room: " + board.room1.isRoom());
 		System.out.println("Hallway 1 is a room: " + board.hallway1.isRoom());
 		
-		System.out.println("After iniatlization, Room 1 is empty: " + board.room1.isEmpty());
+		System.out.println("After initialization, Room 1 is empty: " + board.room1.isEmpty());
 		board.movePlayer(player1, board.room2);
 		System.out.println("After Player 1 moves out of Room 1, Room 1 is empty: " + board.room1.isEmpty());
-
+		*/
 	}
 
 }

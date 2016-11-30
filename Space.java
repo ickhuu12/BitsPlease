@@ -3,7 +3,8 @@ package clueless;
 import java.util.ArrayList;
 
 /**
-*Class for the Space objects
+*Class for the Space objects that form the basis of the rooms and hallways
+*
 *@author Jimmy
 *@version 0.5
 */	
