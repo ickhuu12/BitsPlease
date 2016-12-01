@@ -1,14 +1,17 @@
 package clueless;
 
+import java.util.ArrayList;
+
 /**
 *Class for the Player objects
 *
 *@author Jimmy
-*@version 0.8
+*@version 0.8.5
 */	
 class Player {
 	private boolean isActive = false;
 	public Space location;
+	ArrayList<Card> playerHand = new ArrayList<Card>(3);
 	
 	/**
 	*Method to determine if the board is active

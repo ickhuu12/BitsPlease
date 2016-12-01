@@ -12,7 +12,7 @@ class Space {
 	private boolean isRoom = false;
 	
 	ArrayList<Player> occupiedBy = new ArrayList<Player>(0);
-	ArrayList<Space> accessPoints = new ArrayList<Space>(2);
+	ArrayList<Space> accessPoints = new ArrayList<Space>(8);
 	
 	/**
 	*Basic constructor (use for hallway creations)

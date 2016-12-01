@@ -22,6 +22,7 @@ public class Tester {
 		BoardGame boardGame = new BoardGame();
 		boardGame.loadWinningCards();
 		boardGame.combineDecks();
+		boardGame.dealCards(playerList);
 		
 		/*Board board = new Board();
 		board.loadInitialBoard(playerList);
