@@ -6,25 +6,28 @@ import java.util.ArrayList;
 *Class for the Space objects that form the basis of the rooms and hallways
 *
 *@author Jimmy
-*@version 0.5
+*@version 1.0
 */	
 class Space {
 	private boolean isRoom = false;
+	protected String name;
 	
 	ArrayList<Player> occupiedBy = new ArrayList<Player>(0);
-	ArrayList<Space> accessPoints = new ArrayList<Space>(8);
+	ArrayList<Space> pathsToLeave = new ArrayList<Space>(0);
 	
 	/**
 	*Basic constructor (use for hallway creations)
 	*/
-	public Space(){}
+	public Space(){	}
 
 	/**
 	*Overloaded constructor (use for room creations)
 	*
+	*@param name String value to be used as the name for the room
 	*@param makeRoom boolean value from Board class specifying room to be created
 	*/
-	Space(boolean makeRoom) {
+	Space(String name, boolean makeRoom) {
+		this.name = name;
 		this.isRoom = true;
 	}
 

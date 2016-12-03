@@ -1,11 +1,11 @@
 package clueless;
 
-import java.util.*;
+//import java.util.*;
 
 public class Tester {
 
 	public static void main(String[] args) {
-		Player player1 = new Player();
+		/*Player player1 = new Player();
 		Player player2 = new Player();
 		Player player3 = new Player();
 		Player player4 = new Player();
@@ -17,12 +17,14 @@ public class Tester {
 		playerList.add(player3);
 		playerList.add(player4);
 		playerList.add(player5);
-		playerList.add(player6);
+		playerList.add(player6);*/
 		
 		BoardGame boardGame = new BoardGame();
+		boardGame.createPlayerList();
 		boardGame.loadWinningCards();
 		boardGame.combineDecks();
-		boardGame.dealCards(playerList);
+		boardGame.dealCards();
+		boardGame.gamePlayLoop();
 		
 		/*Board board = new Board();
 		board.loadInitialBoard(playerList);
