@@ -5,9 +5,10 @@ import java.util.ArrayList;
 /**
 *Class for the Board object
 *@author Jimmy
-*@version 0.4
+*@version 1.0
 */	
 class Board {
+	public String name;
 	public static boolean makeRoom = true;
 	public Space study = new Space("Study", makeRoom);	//Following lines set up the 21 spaces of the game
 	public Space hall = new Space("Hall", makeRoom);
@@ -18,18 +19,18 @@ class Board {
 	public Space conserv = new Space("Conservatory", makeRoom);
 	public Space ballroom = new Space("Ballroom", makeRoom);
 	public Space kitchen = new Space("Kitchen", makeRoom);
-	public Space studyHallHallway = new Space();
-	public Space hallLoungeHallway = new Space();
-	public Space studyLibraryHallway = new Space();
-	public Space hallBilliardHallway = new Space();
-	public Space loungeDiningHallway = new Space();
-	public Space libraryBilliardHallway = new Space();
-	public Space billiardDiningHallway = new Space();
-	public Space libraryConserHallway = new Space();
-	public Space billiardBallroomHallway = new Space();
-	public Space diningKitchenHallway = new Space();
-	public Space conservBallroomHallway = new Space();
-	public Space ballroomKitchenHallway = new Space();
+	public Space studyHallHallway = new Space("Study-Hall Hallway");
+	public Space hallLoungeHallway = new Space("Hall-Lounge Hallway");
+	public Space studyLibraryHallway = new Space("Study-Library Hallway");
+	public Space hallBilliardHallway = new Space("Hall-Billard Room Hallway");
+	public Space loungeDiningHallway = new Space("Lounge-Dining Room Hallway");
+	public Space libraryBilliardHallway = new Space("Library-Billiard Room Hallway");
+	public Space billiardDiningHallway = new Space("Billard Room-Dining Room Hallway");
+	public Space libraryConserHallway = new Space("Library-Conservatory Hallway");
+	public Space billiardBallroomHallway = new Space("Billard Room-Ballroom Hallway");
+	public Space diningKitchenHallway = new Space("Dining Room-Kitchen Hallway");
+	public Space conservBallroomHallway = new Space("Conservatory-Ballroom Hallway");
+	public Space ballroomKitchenHallway = new Space("Ballroom-Kitchen Hallway");
 	
 	/**
 	 * Method to attach all rooms and hallways to each other
@@ -43,13 +44,13 @@ class Board {
 		studyHallHallway.pathsToLeave.add(study);
 		studyHallHallway.pathsToLeave.add(hall);
 		hall.pathsToLeave.add(studyHallHallway);
-		hall.pathsToLeave.add(billiard);
+		hall.pathsToLeave.add(hallBilliardHallway);
 		hall.pathsToLeave.add(hallLoungeHallway);
 		hallLoungeHallway.pathsToLeave.add(hall);
 		hallLoungeHallway.pathsToLeave.add(lounge);
 		lounge.pathsToLeave.add(hallLoungeHallway);
 		lounge.pathsToLeave.add(billiard);
-		lounge.pathsToLeave.add(dining);
+		lounge.pathsToLeave.add(diningKitchenHallway);
 		
 		//second row (three hallways)
 		studyLibraryHallway.pathsToLeave.add(study);
@@ -90,7 +91,7 @@ class Board {
 		conservBallroomHallway.pathsToLeave.add(conserv);
 		conservBallroomHallway.pathsToLeave.add(ballroom);
 		ballroom.pathsToLeave.add(conservBallroomHallway);
-		ballroom.pathsToLeave.add(billiard);
+		ballroom.pathsToLeave.add(billiardBallroomHallway);
 		ballroom.pathsToLeave.add(ballroomKitchenHallway);
 		ballroomKitchenHallway.pathsToLeave.add(ballroom);
 		ballroomKitchenHallway.pathsToLeave.add(kitchen);

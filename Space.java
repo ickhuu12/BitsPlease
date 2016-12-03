@@ -18,7 +18,9 @@ class Space {
 	/**
 	*Basic constructor (use for hallway creations)
 	*/
-	public Space(){	}
+	public Space(String name){
+		this.name = name;
+	}
 
 	/**
 	*Overloaded constructor (use for room creations)
@@ -47,5 +49,44 @@ class Space {
 	*/
 	boolean isRoom(){
 		return isRoom;
+	}
+	
+	/**
+	* 
+	* @param destination String value representing name of the room to be moved to
+	* @return room a link to the room object to be moved to it exists as an exit, null Space otherwise
+	*/
+	public Space validOption(String destination){
+		for (Space room : pathsToLeave){
+			if (room.name.equals(destination)){
+				return room;
+			}
+		}
+		return null;
+	}
+	
+	/**
+	* Method to print out the name of the active Space
+	* 
+	* @return name String name of the active Space
+	*/
+	@Override
+	public String toString(){
+		return this.name;
+	}
+	
+	/**
+	* Method overrides equals method to check for comparison of space name instead of object location
+	* 
+	* @param space Space object that will compared to the active Space
+	* @return isEqual boolean value true if name of active Space and comparison are the same, false otherwise
+	*/
+	@Override
+	public boolean equals(Object space){
+		boolean isEqual = false;
+			if (space instanceof Space){
+				isEqual = (this.name.equals(((Space) space).name)); 
+			}
+		return isEqual;
 	}
 }

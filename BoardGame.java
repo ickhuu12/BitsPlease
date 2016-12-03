@@ -6,7 +6,7 @@ package clueless;
 *and handles actions players undertake.
 *
 *@author Jimmy
-*@version 0.4
+*@version 1.0
 */	
 
 import java.util.ArrayList;
@@ -31,6 +31,10 @@ public class BoardGame {
 	Card murderer = new Card();
 	Card weapon = new Card();
 	
+	/**
+	 * Method to create the list of players.  Also calls methods to load players into their intial
+	 * positions and connect all the rooms exits to each other
+	 */
 	void createPlayerList(){
 		Player peacock = new Player("Mrs. Peacock");
 		Player plum = new Player("Professor Plum");
@@ -45,6 +49,7 @@ public class BoardGame {
 		playerList.add(white);
 		playerList.add(mustard);
 		currentBoard.loadInitialBoard(playerList);
+		currentBoard.setUpExits();
 		
 		System.out.println("Location of Mrs. Peacock: " + peacock.location.name);
 	}
@@ -88,10 +93,15 @@ public class BoardGame {
 		}
 	}
 	
+	/**
+	*Method for the overarching gameplay loop.  Does not end until victory condition is met
+	*/
 	void gamePlayLoop(){
 		int turn = 0;
 		while (!victory){
 			int playerIndex = turn % 6;
+			
+			//if statement checks if a player is human and not eliminated, skips turn if either condition is false
 			if (playerList.get(playerIndex).checkPerson() && !playerList.get(playerIndex).checkElimination()){
 				System.out.println(playerList.get(playerIndex).name + "'s Turn");
 				System.out.println("Which action would you like to take?");
@@ -104,23 +114,36 @@ public class BoardGame {
 		}
 	}
 	
+	/**
+	 * Method to handle the action selected by the player
+	 * 
+	 * @param choice string representing user input
+	 * @param playerIndex index of the currently active player in playerList
+	 */
 	void handleAction(String choice, int playerIndex){
 		switch(choice){
-			case "card":
+			case "card":	//prints out the cards if the hand
 				System.out.println("Your cards are: " + playerList.get(playerIndex).playerHand.get(0).name 
 						+ ", " + playerList.get(playerIndex).playerHand.get(1).name 
 						+ ", " + playerList.get(playerIndex).playerHand.get(2).name);
 				break;
-			case "move":
+			case "move":	//allows the player to move to adjacent room
 				System.out.println("Where to move?");
+				System.out.println(playerList.get(playerIndex).location.pathsToLeave);
 				String decision = kb.nextLine();
-				
-				//currentBoard.movePlayer(playerList.get(PlayerIndex), );
+				Space movingTo = playerList.get(playerIndex).location.validOption(decision);
+				if (movingTo != null){
+					if(movingTo.isRoom() || (!movingTo.isRoom() && movingTo.isEmpty())){
+						currentBoard.movePlayer(playerList.get(playerIndex), movingTo);
+					}else{
+						System.out.println("Sorry, " + movingTo.name + " is already occupied by " + movingTo.occupiedBy.toString());
+					}
+				}
 				break;
-			case "suggest":
+			case "suggest":	//player makes suggestion
 				handleSuggestion(playerIndex);
 				break;
-			case "accuse":
+			case "accuse": //player makes accusation
 				handleAccused(playerIndex);
 				break;
 			default:
@@ -128,9 +151,17 @@ public class BoardGame {
 		}
 	}
 
+	/**
+	 * Method to handle suggestion.  Starts by getting user input, creates a Card object for each of the three
+	 * components of the suggestion, and then in the for loop gives the other players the opportunity to disprove
+	 * the suggestion
+	 * 
+	 * @param playerIndex int for current player in playerList (NOT used for other players when needing to disprove suggestion)
+	 */
 	private void handleSuggestion(int playerIndex) {
 		System.out.println("Your room is: " + playerList.get(playerIndex).location.name + ". Who committed the murder?");
 		String murdererGuess = kb.nextLine();
+		forceMovePlayer(murdererGuess, playerList.get(playerIndex).location);
 		System.out.println("And with what weapon was the deed committed?");
 		String weaponGuess = kb.nextLine();
 		Card roomCard = new Card(playerList.get(playerIndex).location.name, CardType.Room);
@@ -157,9 +188,16 @@ public class BoardGame {
 		System.out.println("No one disproved that suggestion.");
 	}
 
+	/**
+	 * Method to handle accusation.  Starts by getting user input, and checks each of the three components against
+	 * the predetermined victory cards.  Will eliminate player if they guess wrong, end game if they guess right
+	 * 
+	 * @param playerIndex int for current player in playerList
+	 */
 	private void handleAccused(int playerIndex) {
 		System.out.println("Your room is: " + playerList.get(playerIndex).location.name + ". Who committed the murder?");
 		String murdererGuess = kb.nextLine();
+		forceMovePlayer(murdererGuess, playerList.get(playerIndex).location);
 		System.out.println("And with what weapon was the deed committed?");
 		String weaponGuess = kb.nextLine();
 		if (playerList.get(playerIndex).location.name.equalsIgnoreCase(room.name) && murdererGuess.equalsIgnoreCase(murderer.name) &&
@@ -170,6 +208,21 @@ public class BoardGame {
 		}else{
 			System.out.println("You have guessed incorrectly.  You are eliminated");
 			playerList.get(playerIndex).eliminate();
+		}
+	}
+	
+	/**
+	 * Method to move a player who has been accused/suggestion of being the murderer to the room
+	 * where accusation/suggestion is taking place
+	 * 
+	 * @param murderGuess String name of the person to be moved
+	 * @param location Space location they will be moved to
+	 */
+	private void forceMovePlayer(String murderGuess, Space location){
+		for (Player player : playerList){
+			if (player.name.equals(murderGuess)){
+				currentBoard.movePlayer(player, location);
+			}
 		}
 	}
 }

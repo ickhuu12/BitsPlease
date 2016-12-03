@@ -6,7 +6,7 @@ import java.util.ArrayList;
 *Class for the Player objects
 *
 *@author Jimmy
-*@version 0.8.5
+*@version 1.0
 */	
 class Player {
 	public String name;
