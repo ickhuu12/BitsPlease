@@ -29,6 +29,9 @@ public class ClueLessClient{
     		}
     		while (true){
     			response = in.readLine();
+    			if(response.startsWith("MESSAGE")){
+    				System.out.println(response);
+    			}
     		
     		}
     	}
