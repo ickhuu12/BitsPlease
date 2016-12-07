@@ -27,6 +27,7 @@ public class BoardGame {
 	ArrayList<Card> combinedDeck = new ArrayList<Card>(0);	//will be used for combined deck later
 	ArrayList<Player> playerList = new ArrayList<Player>();
 	private boolean victory = false;
+	private boolean endTurn = false;
 	Card room = new Card();
 	Card murderer = new Card();
 	Card weapon = new Card();
@@ -50,8 +51,6 @@ public class BoardGame {
 		playerList.add(mustard);
 		currentBoard.loadInitialBoard(playerList);
 		currentBoard.setUpExits();
-		
-		System.out.println("Location of Mrs. Peacock: " + peacock.location.name);
 	}
 	
 	/**
@@ -80,7 +79,6 @@ public class BoardGame {
 		combinedDeck.addAll(suspectDeck);
 		combinedDeck.addAll(weaponDeck);
 		Collections.shuffle(combinedDeck);
-		System.out.println("The 1st element of the combined deck is: " + combinedDeck.get(0).name);
 	}
 	
 	/**
@@ -98,18 +96,24 @@ public class BoardGame {
 	*/
 	void gamePlayLoop(){
 		int turn = 0;
+		String choice;
 		while (!victory){
+			endTurn = false;
 			int playerIndex = turn % 6;
 			
 			//if statement checks if a player is human and not eliminated, skips turn if either condition is false
 			if (playerList.get(playerIndex).checkPerson() && !playerList.get(playerIndex).checkElimination()){
 				System.out.println(playerList.get(playerIndex).name + "'s Turn");
-				System.out.println("Which action would you like to take?");
-				String choice = kb.nextLine().toLowerCase();
-				handleAction(choice, playerIndex);
-				if (choice.equals("exit")){
-					victory = true;
-				}
+				do{
+					System.out.println("Which action would you like to take?");
+					System.out.println("Hand, Rules, Move, Suggest, Accuse, Pass");
+					choice = kb.nextLine().toLowerCase();
+					handleAction(choice, playerIndex);
+					if (choice.equals("exit")){
+						victory = true;
+						break;
+					}
+				}while (!endTurn);
 			}turn++;
 		}
 	}
@@ -122,7 +126,7 @@ public class BoardGame {
 	 */
 	void handleAction(String choice, int playerIndex){
 		switch(choice){
-			case "card":	//prints out the cards if the hand
+			case "hand":	//prints out the cards if the hand
 				System.out.println("Your cards are: " + playerList.get(playerIndex).playerHand.get(0).name 
 						+ ", " + playerList.get(playerIndex).playerHand.get(1).name 
 						+ ", " + playerList.get(playerIndex).playerHand.get(2).name);
@@ -133,8 +137,15 @@ public class BoardGame {
 				String decision = kb.nextLine();
 				Space movingTo = playerList.get(playerIndex).location.validOption(decision);
 				if (movingTo != null){
-					if(movingTo.isRoom() || (!movingTo.isRoom() && movingTo.isEmpty())){
+					if (!playerList.get(playerIndex).location.isRoom()){
 						currentBoard.movePlayer(playerList.get(playerIndex), movingTo);
+						System.out.println("You must now make a suggestion");
+						handleSuggestion(playerIndex);
+						endTurn = true;
+					}
+					else if(playerList.get(playerIndex).movedByForce || (!movingTo.isRoom() && movingTo.isEmpty())){
+						currentBoard.movePlayer(playerList.get(playerIndex), movingTo);
+						endTurn = true;
 					}else{
 						System.out.println("Sorry, " + movingTo.name + " is already occupied by " + movingTo.occupiedBy.toString());
 					}
@@ -142,11 +153,20 @@ public class BoardGame {
 				break;
 			case "suggest":	//player makes suggestion
 				handleSuggestion(playerIndex);
+				endTurn = true;
 				break;
 			case "accuse": //player makes accusation
 				handleAccused(playerIndex);
+				endTurn = true;
+				break;
+			case "rules": //displays rules
+				Rules.showRules();
+				break;
+			case "pass":
+				endTurn = true;
 				break;
 			default:
+				System.out.println("Not a command");
 				break;
 		}
 	}
@@ -222,7 +242,9 @@ public class BoardGame {
 		for (Player player : playerList){
 			if (player.name.equals(murderGuess)){
 				currentBoard.movePlayer(player, location);
+				player.movedByForce = true;
 			}
+			
 		}
 	}
 }

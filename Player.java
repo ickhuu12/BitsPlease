@@ -14,6 +14,7 @@ class Player {
 	public Space location;
 	private boolean isEliminated = false;
 	private boolean isPerson = true;
+	public boolean movedByForce = false;
 	ArrayList<Card> playerHand = new ArrayList<Card>(3);
 	
 	
