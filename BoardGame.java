@@ -115,6 +115,7 @@ public class BoardGame {
 					}
 				}while (!endTurn);
 			}turn++;
+			playerList.get(playerIndex).movedByForce = false;
 		}
 	}
 	
@@ -233,7 +234,8 @@ public class BoardGame {
 	
 	/**
 	 * Method to move a player who has been accused/suggestion of being the murderer to the room
-	 * where accusation/suggestion is taking place
+	 * where accusation/suggestion is taking place.  Sets to true boolean keeping track they were moved
+	 * to a room by an accusation/suggestion the previous turn.
 	 * 
 	 * @param murderGuess String name of the person to be moved
 	 * @param location Space location they will be moved to
