@@ -14,7 +14,17 @@ import java.util.Collections;
 import java.util.Random;
 import java.util.Scanner;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.*;
+
 import clueless.Card.CardType;
+//import edu.lmu.cs.networking.Game;
+//import edu.lmu.cs.networking.Game.Player;
 
 public class BoardGame {
 	Random rng = new Random();
@@ -30,6 +40,13 @@ public class BoardGame {
 	Card room = new Card();
 	Card murderer = new Card();
 	Card weapon = new Card();
+	Player currentPlayer;
+	Player secondaryPlayer;
+	static ClientThreadHandler currentThread;
+	ClientThreadHandler secondaryThread;
+	public static ArrayList<ClientThreadHandler> connectedClients = new ArrayList<ClientThreadHandler>();
+	int turns = 0;
+	
 	
 	/**
 	 * Method to create the list of players.  Also calls methods to load players into their intial
@@ -50,8 +67,8 @@ public class BoardGame {
 		playerList.add(mustard);
 		currentBoard.loadInitialBoard(playerList);
 		currentBoard.setUpExits();
-		
-		System.out.println("Location of Mrs. Peacock: " + peacock.location.name);
+		currentPlayer = playerList.get(0);
+		System.out.println("Location of current player" +currentPlayer.name + " " + currentPlayer.location.name);
 	}
 	
 	/**
@@ -93,9 +110,11 @@ public class BoardGame {
 		}
 	}
 	
-	/**
-	*Method for the overarching gameplay loop.  Does not end until victory condition is met
-	*/
+
+/**	
+	
+	Method for the overarching gameplay loop.  Does not end until victory condition is met
+	
 	void gamePlayLoop(){
 		int turn = 0;
 		while (!victory){
@@ -112,7 +131,11 @@ public class BoardGame {
 				}
 			}turn++;
 		}
-	}
+	}	
+*/	
+	
+
+	
 	
 	/**
 	 * Method to handle the action selected by the player
@@ -151,6 +174,8 @@ public class BoardGame {
 		}
 	}
 
+
+	
 	/**
 	 * Method to handle suggestion.  Starts by getting user input, creates a Card object for each of the three
 	 * components of the suggestion, and then in the for loop gives the other players the opportunity to disprove
@@ -225,4 +250,130 @@ public class BoardGame {
 			}
 		}
 	}
+	
+	String handleWHO_IS_HERE(){
+		System.out.println("Figuring out who is here");
+		String msg = null;
+		for(int i = 0; i < connectedClients.size(); i++ ){
+			msg = msg + connectedClients.get(i).threadName + " ";
+		}
+		return msg;
+	}
+	String sendMoveRequest(){
+		System.out.println("Sending move request");
+		String msg = "MOVE_REQUEST " + currentPlayer.location.pathsToLeave.toString();
+		return msg;
+	}
+	
+	String handleMoveReply(String location){
+		Space movingTo = currentPlayer.location.validOption(location);
+		String msg = null;
+		if (movingTo != null){
+			if(movingTo.isRoom() || (!movingTo.isRoom() && movingTo.isEmpty())){
+				System.out.println("Space unoccupied, Moving " +currentPlayer.name +" to " + movingTo.name);
+				msg = "MESSAGE Space unoccupied, Moving to " + movingTo.name;
+				broadcast(msg);
+				currentBoard.movePlayer(currentPlayer, movingTo);
+			}else{
+				msg = sendMoveRequest();
+			}
+		}
+		return msg;
+	}
+	
+	String switchCurrentPlayer(){
+		boolean done = false;
+		while(!done){
+			int playerIndex = turns % 6;
+			if (playerList.get(playerIndex).checkPerson() && !playerList.get(playerIndex).checkElimination()){
+				currentPlayer = playerList.get(playerIndex);
+				done = true;
+			}
+			turns++;
+		}
+		return "CURRENT_PLAYER " + currentPlayer.name;
+	}
+	
+	void sendPlayerSuggestionRequest(){
+		
+	}
+	
+	void broadcast(String message){
+		System.out.println("Broadcasting message using System.out: "+ message);
+		for(int i = 0; i < connectedClients.size(); i++){
+			connectedClients.get(i).output.println(message + "---broacasted message");
+		}
+	}
+class ClientThreadHandler extends Thread{
+	String threadName;
+	Socket socket;
+    BufferedReader input;
+    PrintWriter output;
+    String currentThreadName;
+    
+	public ClientThreadHandler(Socket socket, String name){
+		this.socket = socket;
+		this.threadName = name;
+
+		try{
+			input = new BufferedReader(
+					new InputStreamReader(socket.getInputStream()));
+			output = new PrintWriter(socket.getOutputStream(), true);
+			output.println("WELCOME " + name);
+			output.println("MESSAGE Waiting for next player to connect");
+		} catch (IOException e){
+			System.out.println("Player " + name + " died" + e);
+		}
+		
+	}
+	
+    /**
+     * The run method of this thread.
+     */
+    public void run() {
+    	try{
+    		// The thread is only started after everyone connects.
+    		output.println("MESSAGE All players connected");
+    		
+    		//initiate the game loop
+    		if (threadName == "Mrs. Peacock"){
+    			//send your move message
+    			output.println("ACTION_REQUEST Mrs. Peacock, which action would you like to take? card, move, suggest, or accuse ");
+    		}else{
+    			output.println("MESSAGE It is Mrs. Peacock's turn.  Waiting for her to take a action.");
+    		}
+    		
+    		while (true){
+    			String command = input.readLine();
+    			
+    			if (command.startsWith("move")){
+    				System.out.println("client selected move");
+    				output.println(sendMoveRequest());
+    			}
+    			if (command.startsWith("MOVE_REPLY")){
+    				System.out.println(this.threadName + " selected room : " + command);
+    				String location = command.substring(11);
+    				output.println(handleMoveReply(location));
+    				
+    			}
+    			if (command.startsWith("suggest")){
+    				sendPlayerSuggestionRequest();
+    			}
+    			
+    			if (command.startsWith("WHO_IS_HERE")){
+    				output.println(handleWHO_IS_HERE());
+    			}
+
+    		}
+        } catch (IOException e) {
+            System.out.println("Player died: " + e);
+        } finally {
+            try {socket.close();} catch (IOException e) {}
+        }
+    }
+}
+/**
+ * I need to figure out how to transition between threads and executing the game loop.
+ * 
+ */
 }
