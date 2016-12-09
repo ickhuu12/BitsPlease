@@ -345,8 +345,46 @@ class ClientThreadHandler extends Thread{
     		
     		while (true){
     			String command = input.readLine();
+    			String header = command.split(" ")[0];
     			
-    			if (command.startsWith("move")){
+    			switch(header){
+    				case "move":
+    					System.out.println("entered move");
+    					break;
+    				case "MOVE_REPLY":
+    					System.out.println("entered MOVE_REPLY");
+    					break;
+    				case "card":
+    					System.out.println("entered card");
+    					break;
+    				case "suggest":
+    					System.out.println("entered suggest");
+    					break;
+    				case "SUGGESTION_PLAYER_REPLY":
+    					System.out.println("entered SUGGESTION_PLAYER_REPLY");
+    					break;
+    				case "SUGGESTION_WEAPON_REPLY":
+    					System.out.println("entered SUGGESTION_WEAPON_REPLY");
+    					break;
+    				case "DISPROVE_REPLY":
+    					System.out.println("entered DISPROVE_REPLY");
+    					break;
+    				case "end_turn":
+    					System.out.println("entered end_turn");
+    					break;
+    				case "acuse":
+    					System.out.println("entered acuse");
+    					break;
+    				case "ACUSATION_PLAYER_REPLY":
+    					System.out.println("entered ACUSATION_PLAYER_REPLY");
+    					break;
+    				case "ACUSATION_WEAPON_REPLY":
+    					System.out.println("entered ACUSATION_WEAPON_REPLY");
+    					break;
+    				
+    			}
+    			
+    			/**if (command.startsWith("move")){
     				System.out.println("client selected move");
     				output.println(sendMoveRequest());
     			}
@@ -362,7 +400,7 @@ class ClientThreadHandler extends Thread{
     			
     			if (command.startsWith("WHO_IS_HERE")){
     				output.println(handleWHO_IS_HERE());
-    			}
+    			}*/
 
     		}
         } catch (IOException e) {

@@ -28,14 +28,43 @@ public class ClueLessClient{
     	Scanner scan = new Scanner(System.in);
     	try{
     		response = in.readLine();
+    		String header = response.split(" ")[0];
     		System.out.println(response);
-    		if (response.startsWith("WELCOME")){
+    		if (header == "WELCOME"){
     			String name = response.substring(8);
     			System.out.println("ClueLess " + name);
     		}
     		while (!endGame){
     			response = in.readLine();
-    			if(response.startsWith("MESSAGE")){
+    			header = response.split(" ")[0];
+    			switch(header){
+    				case "ACTION_REQUEST":
+    					System.out.println("entered ACTION_REQUEST");
+    					break;
+    				case "MOVE_REQUEST":
+    					System.out.println("enered MOVE_REQUEST");
+    					break;
+    				case "CURRENT_PLAYER":
+    					System.out.println("entered CURRENT_PLAYER");
+    					break;
+    				case "SUGGESTION_PLAYER_REQUEST":
+    					System.out.println("entered SUGGESTION_PLAYER_REQUEST");
+    					break;
+    				case "DISPROVE_REQUEST":
+    					System.out.println("enetered DISPROVE_REQUEST");
+    					break;
+    				case "NO_DISPROVES":
+    					System.out.println("entered NO_DISPROVES");
+    					break;
+    				case "ACUSATION_PLAYER_REQUEST":
+    					System.out.println("entered ACUSATION_PLAYER_REQUEST");
+    					break;
+    				default:
+    					break;
+    			}
+    				
+    				
+    			/**if(response.startsWith("MESSAGE")){
     				System.out.println(response);
     			}
     			else if(response.startsWith("ACTION_REQUEST")){
@@ -47,9 +76,10 @@ public class ClueLessClient{
     				System.out.println(response);
     				String msg = scan.nextLine();
     				out.println("MOVE_REPLY " + msg);
+    				
     			}else{
     				out.println(scan.nextLine());
-    			}
+    			}*/
     		}
     		out.println("QUIT");
     	}
