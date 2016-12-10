@@ -190,7 +190,7 @@ public class Accusation extends JDialog {
 			JTextPane txtpnMakingAnAccusation = new JTextPane();
 			txtpnMakingAnAccusation.setEditable(false);
 			txtpnMakingAnAccusation.setText("Making An Accusation");
-			txtpnMakingAnAccusation.setBounds(111, 0, 110, 20);
+			txtpnMakingAnAccusation.setBounds(111, 0, 145, 20);
 			contentPanel.add(txtpnMakingAnAccusation);
 		}
 		{

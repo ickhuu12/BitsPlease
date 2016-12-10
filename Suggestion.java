@@ -130,7 +130,7 @@ public class Suggestion extends JDialog {
 				JTextPane txtpnMakingASuggestion = new JTextPane();
 				txtpnMakingASuggestion.setEditable(false);
 				txtpnMakingASuggestion.setText("Making a Suggestion");
-				txtpnMakingASuggestion.setBounds(154, 0, 109, 20);
+				txtpnMakingASuggestion.setBounds(154, 0, 140, 20);
 				panel.add(txtpnMakingASuggestion);
 			}
 		}

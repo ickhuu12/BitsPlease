@@ -94,7 +94,7 @@ public class BackGroundFrame extends JFrame {
 			public void mouseClicked(MouseEvent arg0) {
 			}
 		});
-		btnMakeSuggestion.setBounds(43, 505, 128, 23);
+		btnMakeSuggestion.setBounds(62, 505, 154, 23);
 		contentPane.add(btnMakeSuggestion);
 		
 		JButton btnMakeAccusation = new JButton("Make Accusation");
@@ -103,14 +103,14 @@ public class BackGroundFrame extends JFrame {
 			public void mouseClicked(MouseEvent e) {
 			}
 		});
-		btnMakeAccusation.setBounds(181, 505, 136, 23);
+		btnMakeAccusation.setBounds(226, 505, 136, 23);
 		contentPane.add(btnMakeAccusation);
 		
 		JButton btnSendChat = new JButton("Send Chat");
-		btnSendChat.setBounds(638, 505, 89, 23);
+		btnSendChat.setBounds(624, 505, 103, 23);
 		contentPane.add(btnSendChat);
 		
-		JButton btnBlockChatUser = new JButton("Block Chat User");
+		JButton btnBlockChatUser = new JButton("Block User");
 		btnBlockChatUser.setBounds(730, 505, 110, 23);
 		contentPane.add(btnBlockChatUser);
 		
@@ -120,7 +120,7 @@ public class BackGroundFrame extends JFrame {
 			public void mouseClicked(MouseEvent e) {
 			}
 		});
-		btnMakeMove.setBounds(324, 505, 118, 23);
+		btnMakeMove.setBounds(372, 505, 118, 23);
 		contentPane.add(btnMakeMove);
 	}
 }
