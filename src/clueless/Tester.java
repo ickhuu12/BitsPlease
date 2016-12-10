@@ -8,6 +8,6 @@ public class Tester {
 		boardGame.loadWinningCards();
 		boardGame.combineDecks();
 		boardGame.dealCards();
-		boardGame.gamePlayLoop();
+		//boardGame.gamePlayLoop();
 	}
 }
