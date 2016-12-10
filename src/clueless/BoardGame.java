@@ -21,10 +21,8 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
-
 import clueless.Card.CardType;
-//import edu.lmu.cs.networking.Game;
-//import edu.lmu.cs.networking.Game.Player;
+
 
 public class BoardGame {
 	Random rng = new Random();
@@ -45,13 +43,12 @@ public class BoardGame {
 	static ClientThreadHandler currentThread;
 	ClientThreadHandler secondaryThread;
 	public static ArrayList<ClientThreadHandler> connectedClients = new ArrayList<ClientThreadHandler>();
-	int turns = 0;
 	int playerIndex = 0;
-	String storedRoom;
-	String storedWeapon;
-	String storedPlayer;
+	int storedRoom;
+	int storedWeapon;
+	int storedPlayer;
 	String storedCard;
-	int adder = 0; //secondary player will be currentIndex+adder;
+	int adder = 1; //secondary player will be currentIndex+adder;
 	
 	
 	/**
@@ -74,6 +71,7 @@ public class BoardGame {
 		currentBoard.loadInitialBoard(playerList);
 		currentBoard.setUpExits();
 		currentPlayer = playerList.get(0);
+		secondaryPlayer = playerList.get(1);
 		System.out.println("Location of current player" +currentPlayer.name + " " + currentPlayer.location.name);
 	}
 	
@@ -116,81 +114,13 @@ public class BoardGame {
 		}
 	}
 	
-	
-	/**
-	 * Method to handle the action selected by the player
-	 * 
-	 * @param choice string representing user input
-	 * @param playerIndex index of the currently active player in playerList
-	 */
-	void handleAction(String choice, int playerIndex){
-		switch(choice){
-			case "card":	//prints out the cards if the hand
-				System.out.println("Your cards are: " + playerList.get(playerIndex).playerHand.get(0).name 
-						+ ", " + playerList.get(playerIndex).playerHand.get(1).name 
-						+ ", " + playerList.get(playerIndex).playerHand.get(2).name);
-				break;
-			case "move":	//allows the player to move to adjacent room
-				System.out.println("Where to move?");
-				System.out.println(playerList.get(playerIndex).location.pathsToLeave);
-				String decision = kb.nextLine();
-				Space movingTo = playerList.get(playerIndex).location.validOption(decision);
-				if (movingTo != null){
-					if(movingTo.isRoom() || (!movingTo.isRoom() && movingTo.isEmpty())){
-						currentBoard.movePlayer(playerList.get(playerIndex), movingTo);
-					}else{
-						System.out.println("Sorry, " + movingTo.name + " is already occupied by " + movingTo.occupiedBy.toString());
-					}
-				}
-				break;
-			case "suggest":	//player makes suggestion
-				handleSuggestion(playerIndex);
-				break;
-			case "accuse": //player makes accusation
-				handleAccused(playerIndex);
-				break;
-			default:
-				break;
+	String boardDescription(){
+		String message = "MESSAGE ";
+		for(int i = 0; i < 6 ; i++){
+			message = message + "["+playerList.get(i).name + " -> " + playerList.get(i).location.toString() + "] ";
 		}
-	}
-
-
-	
-	/**
-	 * Method to handle suggestion.  Starts by getting user input, creates a Card object for each of the three
-	 * components of the suggestion, and then in the for loop gives the other players the opportunity to disprove
-	 * the suggestion
-	 * 
-	 * @param playerIndex int for current player in playerList (NOT used for other players when needing to disprove suggestion)
-	 */
-	private void handleSuggestion(int playerIndex) {
-		System.out.println("Your room is: " + playerList.get(playerIndex).location.name + ". Who committed the murder?");
-		String murdererGuess = kb.nextLine();
-		forceMovePlayer(murdererGuess, playerList.get(playerIndex).location);
-		System.out.println("And with what weapon was the deed committed?");
-		String weaponGuess = kb.nextLine();
-		Card roomCard = new Card(playerList.get(playerIndex).location.name, CardType.Room);
-		Card murderCard = new Card(murdererGuess, CardType.Player);
-		Card weaponCard = new Card(weaponGuess, CardType.Weapon);
-		System.out.println(playerList.get(playerIndex).name + " has suggested " + murdererGuess + " with the " + weaponGuess + 
-				" in the " + playerList.get(playerIndex).location.name);
-		int startPosition = playerIndex;
-		for (int suggestOrder = 0; suggestOrder < 5; suggestOrder++){
-			startPosition++;
-			int newIndex = startPosition % 6;
-			Player suggestProofPlayer = playerList.get(newIndex);
-			if (playerList.get(newIndex).checkPerson()){
-				if (suggestProofPlayer.playerHand.contains(roomCard) || suggestProofPlayer.playerHand.contains(weaponCard)
-						|| suggestProofPlayer.playerHand.contains(murderCard)){ 
-					System.out.println("Choose a card to disprove: " + suggestProofPlayer.playerHand);
-					String proof = kb.nextLine();
-					System.out.println(suggestProofPlayer.name + " has disproven " + playerList.get(playerIndex).name + "'s suggest of "
-							+ proof);
-					return;
-				}
-			}
-		}
-		System.out.println("No one disproved that suggestion.");
+		return message;
+		
 	}
 
 	/**
@@ -199,22 +129,28 @@ public class BoardGame {
 	 * 
 	 * @param playerIndex int for current player in playerList
 	 */
-	private void handleAccused(int playerIndex) {
-		System.out.println("Your room is: " + playerList.get(playerIndex).location.name + ". Who committed the murder?");
-		String murdererGuess = kb.nextLine();
-		forceMovePlayer(murdererGuess, playerList.get(playerIndex).location);
-		System.out.println("And with what weapon was the deed committed?");
-		String weaponGuess = kb.nextLine();
-		if (playerList.get(playerIndex).location.name.equalsIgnoreCase(room.name) && murdererGuess.equalsIgnoreCase(murderer.name) &&
-				weaponGuess.equalsIgnoreCase(weapon.name)){
-			System.out.println(playerList.get(playerIndex).name + " has solved the murder!");
-			System.out.println("It was " + murderer.name + " in the " + room.name + " with the " + weapon.name);
-			victory = true;
-		}else{
-			System.out.println("You have guessed incorrectly.  You are eliminated");
-			playerList.get(playerIndex).eliminate();
+	Boolean handleAccused() {
+		Card roomCard = roomDeck.get(storedRoom);
+		Card murdererCard = suspectDeck.get(storedPlayer);
+		Card weaponCard = weaponDeck.get(storedWeapon);
+		
+		if (roomCard == room && murdererCard == murderer && weaponCard == weapon){
+			broadcast("WINNER " + currentPlayer.name + "solved the murder! Solution: "
+					+ storedPlayer + " committed the murder in the " + storedRoom +" with the " 
+					+ storedWeapon );
+			return true;
 		}
+		else{
+			sendMessageToCurrent("MESSAGE you have guessed incorrectly you are eliminated.");
+			playerList.get(playerIndex).eliminate();
+			broadcast("MESSAGE " + currentPlayer.name + " accusation was wrong. They are eliminated from the game");
+			startNewTurn();
+			return false;
+		}
+		
 	}
+	
+	
 	
 	/**
 	 * Method to move a player who has been accused/suggestion of being the murderer to the room
@@ -223,13 +159,9 @@ public class BoardGame {
 	 * @param murderGuess String name of the person to be moved
 	 * @param location Space location they will be moved to
 	 */
-	private void forceMovePlayer(String murderGuess, Space location){
-		for (Player player : playerList){
-			if (player.name.equals(murderGuess)){
-				currentBoard.movePlayer(player, location);
-				broadcast(murderGuess + " has been forced to move to " + location.toString());
-			}
-		}
+	private void forceMovePlayer(int player, Space location){
+		currentBoard.movePlayer(playerList.get(player), location);
+		broadcast("MESSAGE " + playerList.get(player).name + " has been forced to move to " + location.toString());
 	}
 	
 	String handleWHO_IS_HERE(){
@@ -267,7 +199,6 @@ public class BoardGame {
 		return "MESSAGE Your cards are: " + player.playerHand.get(0).name 
 				+ ", " + player.playerHand.get(1).name 
 				+ ", " + player.playerHand.get(2).name;
-		
 	}
 	
 	String sendSuggestionPlayerRequest(){
@@ -279,27 +210,41 @@ public class BoardGame {
 	}
 	
 	String sendSuggestionMessage(){
-		return "MESSAGE " + currentPlayer.name + "has suggested that " + storedPlayer + 
-				"committed the murder in the " + currentPlayer.location.toString() + " with a " + storedWeapon;
+		return "MESSAGE " + currentPlayer.name + "has suggested that " + suspectDeck.get(storedPlayer) + 
+				"committed the murder in the " + currentPlayer.location.toString() + " with a " + weaponDeck.get(storedWeapon);
 	}
 	
-	void sendDisproveRequest(){
-		String message = "DISPROVE_REQUEST " +  handleCard(secondaryPlayer);
-		sendMessagetoSecondary(message);
+	void handleDisprove(){
+		Card roomCard = new Card(playerList.get(playerIndex).location.name, CardType.Room);
+		Card murderCard = suspectDeck.get(storedPlayer);
+		Card weaponCard = weaponDeck.get(storedWeapon);
+		System.out.println("roomCard is: " +roomCard.name);
+		System.out.println("murderCard is: " +murderCard.name);
+		System.out.println("weaponCard is: " +weaponCard.name);
+		
+			
+		Boolean foundProof = false;
+		while(!foundProof){
+			if(switchSecondaryPlayer()){
+				if(secondaryPlayer.playerHand.contains(roomCard) || secondaryPlayer.playerHand.contains(weaponCard)
+						|| secondaryPlayer.playerHand.contains(murderCard)){ 
+					String message = "DISPROVE_REQUEST Choose a card to disprove: " + secondaryPlayer.playerHand;
+					sendMessageToSecondary(message);	
+					foundProof = true;
+				}
+				else{
+					broadcast("MESSAGE " + secondaryPlayer.name + " doesn't have any proof. Moving on to next player");
+					//switchSecondaryPlayer();
+				}	
+			}
+			else{
+				broadcast("MESSAGE all players have been asked and no one has disproved " + currentPlayer.name + "'s suggestion");
+			}
+		}
 	}
 	
 	String sendAccusationWeaponRequest(){
 		return "ACCUSATION_WEAPON_REQUEST" + currentPlayer.name;
-	}
-	
-	Boolean disproven(String card){
-		storedCard = card;
-		if((card == storedWeapon) || (card == storedRoom) || (card == storedPlayer)){
-			return true;
-		}
-		else{
-			return false;
-		}
 	}
 	
 	Boolean validPlayer(String player){
@@ -330,6 +275,24 @@ public class BoardGame {
 		}
 	}
 	
+	Boolean validRoom(String room){
+		if(room == "Study"
+			|| room == "Hall"
+			|| room == "Lounge"
+			|| room == "Library"
+			|| room == "Billard Room"
+			|| room == "Dining Room"
+			|| room == "Conservatory"
+			|| room == "Ballroom"
+			|| room == "Kitchen"){
+			return true;
+		}
+		else{
+			return false;
+		}
+			
+	}
+	
 	String switchCurrentPlayer(){
 		boolean done = false;
 		adder = 0; //reset secondary player adder
@@ -351,11 +314,19 @@ public class BoardGame {
 		return "CURRENT_PLAYER " + currentPlayer.name;
 	}
 	
-	String switchSecondaryPlayer(){
+	Boolean switchSecondaryPlayer(){
+		System.out.println("Switching Secondary Player");
 		adder++;
-		int index = (adder + playerIndex) % 5;
-		secondaryPlayer = playerList.get(index);
-		return secondaryPlayer.name;	
+		if (adder == connectedClients.size()){
+			sendMessageToCurrent("NO_DISPROVES");
+			return false;
+		}
+		else{
+			System.out.println("adder = " + adder + ", playerIndex = " + playerIndex);
+			int index = (adder + playerIndex) % (connectedClients.size()-1);
+			secondaryPlayer = playerList.get(index);
+			return true;
+		}	
 	}
 	
 	void broadcast(String message){//header should be part of the message already
@@ -365,7 +336,7 @@ public class BoardGame {
 		}
 	}
 	
-	void sendMessagetoSecondary(String message){
+	void sendMessageToSecondary(String message){
 		System.out.println("Sending secondary player " + secondaryPlayer.name + " message: " + message);
 		connectedClients.get(adder+playerIndex % 5).output.println(message);
 	}
@@ -376,6 +347,7 @@ public class BoardGame {
 	}
 	
 	void startNewTurn(){
+		adder = 0;
 		broadcast(switchCurrentPlayer());
 		sendMessageToCurrent("ACTION_REQUEST");
 	}
@@ -419,11 +391,15 @@ class ClientThreadHandler extends Thread{
     			output.println("MESSAGE It is Mrs. Peacock's turn.  Waiting for her to take a action.");
     		}
     		
-    		while (true){
+    		while (!victory){
     			String command = input.readLine();
     			String header = command.split(" ")[0];
     			
     			switch(header){
+    				case "update":
+    					output.println(boardDescription() + " ---From " + this.threadName);
+    					output.println("ACTION_REQUEST");
+    				break;
     				case "move":
     					System.out.println("entered move");
     					output.println(sendMoveRequest());
@@ -454,7 +430,6 @@ class ClientThreadHandler extends Thread{
     				case "suggest":
     					System.out.println("entered suggest");
     					if (currentPlayer.location.isRoom()){
-    						storedRoom = currentPlayer.location.toString();
     						output.println(sendSuggestionPlayerRequest());
     					}
     					else{
@@ -465,47 +440,27 @@ class ClientThreadHandler extends Thread{
     				case "SUGGESTION_PLAYER_REPLY":
     					System.out.println("entered SUGGESTION_PLAYER_REPLY");
     					String player = command.substring(24);
-    					if(validPlayer(player)){
-    						//succeeded in selecting a player
-    						storedPlayer = player;
-    						output.println(sendSuggesitonWeaponRequest());
-    					}
-    					else{
-    						output.println("MESSAGE Error: please suggestt a valid player");
-    						output.println(sendSuggestionPlayerRequest());
-    					}
+    					storedPlayer = Integer.parseInt(player) -1;
+    					output.println(sendSuggesitonWeaponRequest());
     					break;
     				case "SUGGESTION_WEAPON_REPLY":
     					System.out.println("entered SUGGESTION_WEAPON_REPLY");
     					String weapon = command.substring(24);
-    					if(validWeapon(weapon)){
-    						storedWeapon = weapon;
-    						broadcast(sendSuggestionMessage());
-    						forceMovePlayer(storedPlayer,currentPlayer.location);
-    						broadcast(switchSecondaryPlayer());
-    						sendDisproveRequest();
-    					}
-    					else{
-    						
-    					}
+    					storedWeapon = Integer.parseInt(weapon) -1;
+;    					broadcast(sendSuggestionMessage());
+    					forceMovePlayer(storedPlayer,currentPlayer.location);
+    					handleDisprove();
     					break;
     				case "DISPROVE_REPLY":
     					System.out.println("entered DISPROVE_REPLY");
-    					if(disproven(command.substring(14))){
-    						sendMessageToCurrent("MESSAGE your suggestion has been disproven by " + secondaryPlayer.name + "with the card: " + storedCard);//include the card name
-    						//broadcast to everyone that the suggestion has been disproven
-    						broadcast("MESSAGE suggestion has been disproven by " + secondaryPlayer.name);
+    					String response = command.substring(15);
+    					if (response == "1"){
+    						broadcast("MESSAGE your suggestion has been disproven by " + secondaryPlayer.name);//include the card name
     						startNewTurn();
     					}
     					else{
-    						output.println("MESSAGE suggestion not disproven, asking next player to disprove suggestion.");
-    						broadcast(switchSecondaryPlayer());
-    						sendDisproveRequest();
-    					}
-    					break;
-    				case "skip":
-    					System.out.println("entered skip");
     						startNewTurn();
+    					}
     					break;
     				case "end_turn":
     					System.out.println("entered end_turn");
@@ -513,53 +468,28 @@ class ClientThreadHandler extends Thread{
     					break;
     				case "accuse":
     					System.out.println("entered accuse");
-    					//send ACUSTAIONT_PLAYER REQUEST ask who committed the murder and list player options
-    						output.println("ACCUSATION_PLAYER_REQUEST");
+    					output.println("ACCUSATION_PLAYER_REQUEST");
     					break;
     				case "ACCUSATION_PLAYER_REPLY":
     					System.out.println("entered ACCUSATION_PLAYER_REPLY");
     					String accusedPlayer = command.substring(24);
-    					if(validPlayer(accusedPlayer){
-    						storedPlayer = accusedPlayer;
-    						
-    						
-    					}
-    					//verify valid player, store in memory
-    					//ask what weapon and list weapons
+    					storedPlayer = Integer.parseInt(accusedPlayer);
+    					output.println("ACCUSATION_WEAPON_REQUEST " + suspectDeck.get(storedPlayer).name);
     					break;
     				case "ACCUSATION_WEAPON_REPLY":
     					System.out.println("entered ACCUSATION_WEAPON_REPLY");
-    					//read weapon, store varible,
-    					//send ACUSATION_ROOM_REQUEST
+    					String accusedWeapon = command.substring(24);
+    					storedWeapon = Integer.parseInt(accusedWeapon) -1;
+    					output.println("ACCUSATION_ROOM_REQUEST " + suspectDeck.get(storedPlayer).name);
     				case "ACCUSATION_ROOM_REPLY":
-    					//read accused room
-    					//compare to winning cards
-    					//if correct broadcast WINNER currentPlayerName
-    					//if false broadcast message name of player was wrong, the yahve been eliminated
-    					//mark elimination in player list
-    					//Start next turn
+    					String accusedRoom = command.substring(22);
+    					storedRoom = Integer.parseInt(accusedRoom);
+    					handleAccused();
     					break;
-    				
+    				default:
+    					System.out.println("Error, message did not fit any category: ");
+    					System.out.println(command);
     			}
-    			
-    			/**if (command.startsWith("move")){
-    				System.out.println("client selected move");
-    				output.println(sendMoveRequest());
-    			}
-    			if (command.startsWith("MOVE_REPLY")){
-    				System.out.println(this.threadName + " selected room : " + command);
-    				String location = command.substring(11);
-    				output.println(handleMoveReply(location));
-    				
-    			}
-    			if (command.startsWith("suggest")){
-    				sendPlayerSuggestionRequest();
-    			}
-    			
-    			if (command.startsWith("WHO_IS_HERE")){
-    				output.println(handleWHO_IS_HERE());
-    			}*/
-
     		}
         } catch (IOException e) {
             System.out.println("Player died: " + e);

@@ -55,7 +55,7 @@ public class ClueLessClient{
     	    			break;
     				case "ACTION_REQUEST":
     					System.out.println("entered ACTION_REQUEST");
-    					System.out.println(name + ", which action would you like to take? choose one: card, move, suggest, or accuse");
+    					System.out.println(name + ", which action would you like to take? choose one: update, card, move, suggest, or accuse");
     					msg = scan.nextLine();
         				out.println(msg);
     					break;
@@ -78,27 +78,22 @@ public class ClueLessClient{
     				case "SUGGESTION_PLAYER_REQUEST":
     					System.out.println("entered SUGGESTION_PLAYER_REQUEST");
     					System.out.println("You are located in the room: " + response.substring(26) + "Who do you suggesst committed the murder in this room?");
-    					System.out.println("Select a player : Mrs. Peacock, Professor Plum, Miss Scarlet, Mr. Green, Mrs. White, Colonel Mustard");
+    					System.out.println("Select a player : 1)Mrs. Peacock, 2)Professor Plum, 3)Miss Scarlet, 4)Mr. Green, 5)Mrs. White, 6)Colonel Mustard");
     					msg = scan.nextLine();
     					out.println("SUGGESTION_PLAYER_REPLY " + msg);
     					break;
     				case "SUGGESTION_WEAPON_REQUEST":
     					System.out.println("SUGGESTION_WEAPON_REQUEST");
     					System.out.println("With what weapon did " + response.substring(25) + " commit the murder?");
-    					System.out.println("Pick one: knife, rope, revolver, candlestick, lead pipe, wrench");
+    					System.out.println("Pick one: 1)knife, 2)rope, 3)revolver, 4)candlestick, 5)lead pipe, 6)wrench");
     					msg = scan.nextLine();
     					out.println("SUGGESTION_WEAPON_REPLY " + msg);
     				case "DISPROVE_REQUEST":
     					System.out.println("entered DISPROVE_REQUEST");
     					System.out.println(response.substring(17));
-    					System.out.println("Select a card to disprove or call skip");
+    					System.out.println("Select 1)disprove or call 2)skip");
     					msg = scan.nextLine();
-    					if (msg == "skip"){
-    						out.println("skip");
-    					}
-    					else{
-    						out.println("DISPROVE_REPLY" + msg);
-    					}
+    					out.println("DISPROVE_REPLY " + msg);
     					break;
     				case "NO_DISPROVES":
     					System.out.println("entered NO_DISPROVES");
@@ -108,46 +103,32 @@ public class ClueLessClient{
     					break;
     				case "ACCUSATION_PLAYER_REQUEST":
     					System.out.println("entered ACCUSATION_PLAYER_REQUEST");
-    					System.out.println("Select a player accuse : [Mrs. Peacock] [Professor Plum] [Miss Scarlet] [Mr. Green] [Mrs. White] [Colonel Mustard]");
+    					System.out.println("Select a player to accuse : 1)Mrs. Peacock, 2)Professor Plum, 3)Miss Scarlet, 4)Mr. Green, 5)Mrs. White, 6)Colonel Mustard");
     					msg = scan.nextLine();
     					out.println("ACUSATION_PLAYER_REPLY "+ msg);
     					break;
     				case "ACCUSATION_WEAPON_REQUEST":
     					System.out.println("entered ACCUSATION_WEAPON_REQUEST");
     					System.out.println("What what weapon are you acusing " + response.substring(25) + "of using?");
-    					System.out.println("Pick one: knife, rope, revolver, candlestick, lead pipe, wrench");
+    					System.out.println("Pick one: 1)knife, 2)rope, 3)revolver, 4)candlestick, 5)lead pipe, 6)wrench");
     					msg = scan.nextLine();
     					out.println("ACCUSATION_WEAPON_REPLY " + msg);
     				case "ACCUSATION_ROOM_REQUEST":
     					System.out.println("entered ACCUSATION_ROOM_REQUEST");
     					System.out.println("In what room did " + response.substring(23) + " commit the murder?");
-    					System.out.println("Pick one: sudy, hall, lounge, library, billardRoom, diningRoom, conservatory, ballroom, kitchen");
+    					System.out.println("Pick one: 1)Sudy, 2)Hall, 3)Lounge, 4)Library, 5)Billard Room, 6)Dining Room, 7)Conservatory, 8)Ballroom, 9)kitchen");
     					msg = scan.nextLine();
     					out.println("ACCUSATION_ROOM_REPLY " + msg);
     				case "WINNER":
+    					System.out.println("entered WINNER");
+    					System.out.println(response.substring(7));
+    					endGame = true;
     					//END THE GAME	
     				default:
     					System.out.println("Error, Message did not fit any category");
+    					System.out.println(response);
     					break;
     			}
-    				
-    				
-    			/**if(response.startsWith("MESSAGE")){
-    				System.out.println(response);
-    			}
-    			else if(response.startsWith("ACTION_REQUEST")){
-    				System.out.println(response);
-    				String msg = scan.nextLine();
-    				out.println(msg);
-    			}
-    			else if(response.startsWith("MOVE_REQUEST")){
-    				System.out.println(response);
-    				String msg = scan.nextLine();
-    				out.println("MOVE_REPLY " + msg);
-    				
-    			}else{
-    				out.println(scan.nextLine());
-    			}*/
     		}
     		out.println("QUIT");
     	}

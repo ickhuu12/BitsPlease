@@ -26,23 +26,23 @@ public class ClueLessServer {
                 game.dealCards();
                 BoardGame.ClientThreadHandler player1 = game.new ClientThreadHandler(listener.accept(), "Mrs. Peacock");
                 BoardGame.ClientThreadHandler player2 = game.new ClientThreadHandler(listener.accept(), "Professor Plum");
-                //BoardGame.ClientThreadHandler player3 = game.new ClientThreadHandler(listener.accept(), "Mr. Green");
-                //BoardGame.ClientThreadHandler player4 = game.new ClientThreadHandler(listener.accept(), "Miss Scarlet");
-                //BoardGame.ClientThreadHandler player5 = game.new ClientThreadHandler(listener.accept(), "Mrs. White");
-                //BoardGame.ClientThreadHandler player6 = game.new ClientThreadHandler(listener.accept(), "Colonel Mustard");
+                BoardGame.ClientThreadHandler player3 = game.new ClientThreadHandler(listener.accept(), "Mr. Green");
+                BoardGame.ClientThreadHandler player4 = game.new ClientThreadHandler(listener.accept(), "Miss Scarlet");
+                BoardGame.ClientThreadHandler player5 = game.new ClientThreadHandler(listener.accept(), "Mrs. White");
+                BoardGame.ClientThreadHandler player6 = game.new ClientThreadHandler(listener.accept(), "Colonel Mustard");
                 BoardGame.connectedClients.add(player1);
                 BoardGame.connectedClients.add(player2);
-                //BoardGame.connectedClients.add(player3);
-                //BoardGame.connectedClients.add(player4);
-                //BoardGame.connectedClients.add(player5);
-                //BoardGame.connectedClients.add(player6);
+                BoardGame.connectedClients.add(player3);
+                BoardGame.connectedClients.add(player4);
+                BoardGame.connectedClients.add(player5);
+                BoardGame.connectedClients.add(player6);
                 BoardGame.currentThread = player1;
                 player1.start();
                 player2.start();
-                //player3.start();
-                //player4.start();
-                //player5.start();
-                //player6.start();
+                player3.start();
+                player4.start();
+                player5.start();
+                player6.start();
             }
         } finally {
             listener.close();
